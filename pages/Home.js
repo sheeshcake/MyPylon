@@ -94,7 +94,7 @@ const Home = ({navigation}) => {
                                         case '28': penalty = all_data[i].gs$cell.numericValue; break;
                                         case '30': total_deductions = all_data[i].gs$cell.numericValue; break;
                                         case '29': cash_advance = all_data[i].gs$cell.numericValue; break;
-                                        case '31z': total_pay = all_data[i].gs$cell.numericValue; break;
+                                        case '31': total_pay = all_data[i].gs$cell.numericValue; break;
                                     }
                                 }
                             }
