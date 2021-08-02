@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react'
-import { View, Text, Image, SafeAreaView, ScrollView, TextInput, Button } from 'react-native'
+import { View, Text, Image, SafeAreaView, ScrollView, TextInput, Button, StatusBar } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {images} from '../assets';
 
@@ -18,7 +18,7 @@ const [buttonStatus, setButtonStatus] = useState(false)
 
 async function onLogin(){
     setButtonStatus(true)
-    setButtonText("Loggin in....")
+    setButtonText("Logging in....")
     await fetch('https://www.pylonglobal.com/api/login', {
         method: "POST",
         headers: {
@@ -213,6 +213,10 @@ function RenderVersion(){
                 backgroundColor: "#daf2fc"
             }}
         >
+            <StatusBar
+                animated={true}
+                backgroundColor="#daf2fc"
+            />
             {RenderHeader()}
             <ScrollView>
                 {RenderForm()}

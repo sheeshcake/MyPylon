@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Login, Home } from "./pages";
+import { Login, Home, Payslip, Account } from "./pages";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -24,6 +24,14 @@ const App = () => {
         <Stack.Screen
           name="Home"
           component={Home}
+        />
+        <Stack.Screen
+          name="Account"
+          component={Account}
+        />
+        <Stack.Screen
+          name="Payslip"
+          component={Payslip}
         />
 
       </Stack.Navigator>
