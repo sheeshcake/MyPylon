@@ -10,17 +10,20 @@ const Home = ({navigation}) => {
     const [refresh, setRefresh] = useState("Refresh") 
 
     useEffect(async () => {
-        try{
-            let data_json = await AsyncStorage.getItem('user_data')
-            setData(JSON.parse(data_json))
-            getPayroll()
-        }catch(e){
-            navigation.reset({
-                index: 0,
-                routes: [{name: 'Login'}],
-            });
+        getPayroll()
+        if(data.length == 0){
+            try{
+                let data_json = await AsyncStorage.getItem('user_data')
+                setData(JSON.parse(data_json))
+            }catch(e){
+                navigation.reset({
+                    index: 0,
+                    routes: [{name: 'Login'}],
+                });
+            }
         }
-    }, [])
+
+    }, [data])
 
 
     async function getPayroll(){
