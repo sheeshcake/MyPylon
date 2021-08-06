@@ -3,6 +3,7 @@ import { View, Text, ImageBackground, SafeAreaView, TouchableOpacity, TouchableH
 import LinearGradient from 'react-native-linear-gradient'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import QRCode from 'react-native-qrcode-svg'
+import {images} from '../assets';
 
 const Account = ({navigation, route}) => {
 
@@ -62,6 +63,7 @@ const Account = ({navigation, route}) => {
                     style={{
                         flex: 1,
                         justifyContent: 'space-between',
+                        flexDirection: 'row',
                         padding: 20,
                         marginBottom: -150
                     }}
@@ -86,6 +88,25 @@ const Account = ({navigation, route}) => {
                             }}
                         />
                     </TouchableOpacity>
+                    <View
+                        style={{
+                            height: 50,
+                            width: 130,
+                            borderRadius: 20,
+                            padding: 5,
+                            backgroundColor: "rgba(0, 0, 0, 0.1)"
+                        }}
+                    >
+                        <Image 
+                            source={images.logo}
+                            style={{
+                                height: '100%',
+                                width: '100%',
+                                resizeMode: 'stretch'
+                            }}
+                        />
+                    </View>
+
                 </View>
                 <View
                     style={{
@@ -95,7 +116,7 @@ const Account = ({navigation, route}) => {
                     <LinearGradient
                             start={{x: 0, y: 0}}
                             end={{x: 0, y: 1}}
-                            colors={['transparent', "#a8d6ea"]}
+                            colors={['transparent', "#3366CC"]}
                             style={{
                                 width: "100%",
                                 height: 100,
@@ -105,7 +126,7 @@ const Account = ({navigation, route}) => {
                     />
                     <View
                         style={{
-                            backgroundColor: "#a8d6ea",
+                            backgroundColor: "#3366CC",
                             flex: 1,
                             paddingTop: 20
                         }}
@@ -142,28 +163,36 @@ const Account = ({navigation, route}) => {
                         >
                             <QRCode
                                 value={qrdata ? qrdata : "loading data.."}
-                                backgroundColor="#a8d6ea"
+                                backgroundColor="#3366CC"
+                                color="#FFF"
                             />
                         </View>
-                        <TouchableHighlight
+                        <View
                             style={{
-                                margin: 20,
-                                backgroundColor:"#3366CC",
-                                paddingTop: 20,
-                                paddingBottom: 20,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                borderRadius: 20,
+                                justifyContent: 'flex-end'
                             }}
-                            onPress={() => onLogout()}
                         >
-                            <Text
+                            <TouchableHighlight
                                 style={{
-                                    color: "#FFF",
-                                    fontSize: 20
+                                    margin: 20,
+                                    backgroundColor:"#a8d6ea",
+                                    paddingTop: 10,
+                                    paddingBottom: 10,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    borderRadius: 20,
                                 }}
-                            >Logout</Text>
-                        </TouchableHighlight>
+                                onPress={() => onLogout()}
+                            >
+                                <Text
+                                    style={{
+                                        color: "#FFF",
+                                        fontSize: 20
+                                    }}
+                                >Logout</Text>
+                            </TouchableHighlight>
+                        </View>
+
                     </View>
                 </View>
             </ImageBackground>

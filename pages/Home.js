@@ -1,16 +1,24 @@
 import React, {useEffect, useState, useRef} from 'react'
-import { Animated, View, Text, ScrollView, StatusBar, Image, TouchableOpacity } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, ScrollView, StatusBar, Image, TouchableOpacity } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import {images} from '../assets'
+import Animated from 'react-native-reanimated'
+
+
+const HEADER_HEIGHT = 200;
 
 const Home = ({navigation}) => {
 
     const [data, setData] = useState([])
     const [all_periods, setAll_periods] = useState([])
-    const header_h = useRef(new Animated.Value(200)).current
     const [refresh, setRefresh] = useState("Refresh") 
-
+    const scrollY = useRef(new Animated.Value(0)).current
+    const diffClampScrollY = Animated.diffClamp(scrollY, 150, HEADER_HEIGHT)
+    const headerY = Animated.interpolateNode(diffClampScrollY, {
+        inputRange: [150, HEADER_HEIGHT],
+        outputRange: [200, HEADER_HEIGHT - 60]
+    })
     useEffect(async () => {
-        getPayroll()
         if(data.length == 0){
             try{
                 let data_json = await AsyncStorage.getItem('user_data')
@@ -21,8 +29,9 @@ const Home = ({navigation}) => {
                     routes: [{name: 'Login'}],
                 });
             }
+        }else{
+            getPayroll()
         }
-
     }, [data])
 
 
@@ -70,7 +79,7 @@ const Home = ({navigation}) => {
                 }else{
                     //getting the id
                     if(d.gs$cell.col == 1){
-                        if(d.gs$cell.inputValue == data?.user?.id/* this is the id number */){
+                        if(d.gs$cell.inputValue == data?.user?.company_id/* this is the id number */){
                             //getting all the data of the row
                             for(var i = 0; i < all_data.length; i++){
                                 if(all_data[i].gs$cell.row == d.gs$cell.row){
@@ -133,8 +142,12 @@ const Home = ({navigation}) => {
         return(
             <Animated.View
                 style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
                     backgroundColor: "#3366CC",
-                    height: header_h,
+                    height: headerY,
                     borderBottomLeftRadius: 20,
                     borderBottomRightRadius: 20,
                     justifyContent: 'space-around',
@@ -147,13 +160,11 @@ const Home = ({navigation}) => {
                     shadowOpacity: 0.46,
                     shadowRadius: 11.14,
                     elevation: 17,
-                    transition: '0.5s'
                 }}
             >
                 <View
                     style={{
                         flexDirection: 'row',
-                        // justifyContent: 'center'
                         justifyContent: 'space-around',
                     }}
                 >
@@ -201,8 +212,8 @@ const Home = ({navigation}) => {
                                     borderRadius: 100
                                 }}
                                 source={{uri : "https://www.pylonglobal.com/assets/img/team/" + data?.user?.user_image}}
-                            />
-                            </TouchableOpacity>
+                            />  
+                        </TouchableOpacity>
                     </View>
 
                 </View>
@@ -214,11 +225,15 @@ const Home = ({navigation}) => {
 
 
     function renderRefresh(){
-        {renderPayslips()}
         return(
-            <View
+            <Animated.View
                 style={{
+                    position: 'absolute',
+                    zIndex: 20,
+                    backgroundColor: 'rgba(255,255,255,0.99)',
+                    width: '100%',
                     padding: 20,
+                    marginTop: headerY,
                     height: 100
                 }}
             >
@@ -235,14 +250,14 @@ const Home = ({navigation}) => {
                             style={{
                                 fontSize: 20
                             }}
-                        >My Payslips: {data?.user?.id}</Text>
+                        >My Payslips:</Text>
                     </View>
 
                     <TouchableOpacity
                         style={{
                             backgroundColor: "#4154f1",
                             padding: 5,
-                            borderRadius: 10
+                            borderRadius: 10,
                         }}
                         onPress={()=> getPayroll()}
                     >
@@ -254,7 +269,7 @@ const Home = ({navigation}) => {
                         >{refresh}</Text>
                     </TouchableOpacity>
                 </View>
-            </View>
+            </Animated.View>
         )
     }
 
@@ -274,47 +289,39 @@ const Home = ({navigation}) => {
 
     function renderPayslips(){
         return (
-            <View
+            <Animated.View
                     style={{
                         flex: 1,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'white',
                     }}
                 >
-                    <ScrollView
+                    <Animated.ScrollView
                         style={{
                             flex: 1,
-                            padding: 20
+                            padding: 20,
+                            paddingTop: 300
                         }}
-                        onScroll={(event) => {
-                            const scrolling = event.nativeEvent.contentOffset.y;
-                            if(scrolling > 150){
-                                Animated.timing(
-                                    header_h,
-                                        {
-                                            toValue: 150,
-                                            duration: 120,
-                                            useNativeDriver: false
-                                        }
-                                ).start();
-                            }else{
-                                Animated.timing(
-                                    header_h,
-                                        {
-                                            toValue: 200,
-                                            duration: 120,
-                                            useNativeDriver: false
-                                        }
-                                ).start();
+                        showsVerticalScrollIndicator={false}
+                        showsHorizontalScrollIndicator={false}
+                        bounces={false}
+                        scrollEventThrottle={16}
+                        onScroll={Animated.event([
+                            {
+                                nativeEvent: {contentOffset: {y: scrollY}}
                             }
-                        }}
+                        ])}
                     >
                         {
-                            all_periods.length > 0 ? all_periods.map((d, index) => {
+                            all_periods.length > 0 && refresh != "Refreshing.." ? all_periods.map((d, index) => {
                                 return(
                                     <TouchableOpacity
                                         key={index}
                                         style={{
                                             backgroundColor: "#daf2fc",
                                             borderRadius: 20,
+                                            marginBottom: 20,
                                             borderColor: "#000000",
                                             borderWidth: 1,
                                             padding: 30,
@@ -336,10 +343,25 @@ const Home = ({navigation}) => {
                                                 d?.data?.length ? "Status: Released" : "Status: Pending"
                                             }
                                         </Text>
-                                        {/* <Text>V</Text> icons to be added */}
                                     </TouchableOpacity>
                                 )
-                            }): 
+                            }) : refresh == "Refreshing.." ?
+                            <View
+                                style={{
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    flex: 1
+                                }}
+                            >
+                                <Image
+                                    source={images.loading}
+                                    style={{
+                                        height:  200,
+                                        width: 200,
+                                        resizeMode: 'stretch'
+                                    }}
+                                />
+                            </View> :
                             <View
                                 style={{
                                     justifyContent: 'center',
@@ -350,8 +372,8 @@ const Home = ({navigation}) => {
                                 <Text>No Data Available</Text>
                             </View>
                         }
-                    </ScrollView>
-                </View>
+                    </Animated.ScrollView>
+                </Animated.View>
         )
     }
 
@@ -359,18 +381,16 @@ const Home = ({navigation}) => {
         <View
             style={{
                 flex: 1,
-                flexDirection: 'column'
             }}
         >
+            {renderTopBar()}
+            {renderRefresh()}
+            {renderPayslips()}
+            {RenderVersion()}
             <StatusBar
                 animated={true}
                 backgroundColor="#3366CC"
             />
-            {renderTopBar()}
-            {renderRefresh()}
-            {renderPayslips()}
-            
-            {RenderVersion()}
         </View>
     )
 }

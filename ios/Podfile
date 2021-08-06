@@ -12,11 +12,7 @@ target 'MyPylon' do
     :hermes_enabled => false
   )
 
-  pod 'react-native-safe-area-context', :path => '../node_modules/react-native-safe-area-context'
-
-  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-async-storage/async-storage'
-
-  pod 'RNSVG', :path => '../node_modules/react-native-svg'
+  pod 'RNReanimated', :path => '../node_modules/react-native-reanimated'
 
   target 'MyPylonTests' do
     inherit! :complete
