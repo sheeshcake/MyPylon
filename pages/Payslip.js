@@ -7,13 +7,16 @@ const Payslip = ({navigation, route}) => {
     const [payslipdata, setPaySlipData] = useState([])
     const header_h = useRef(new Animated.Value(100)).current
     const [start_day, setStartDay] = useState(0)
+    const [end_day, setEndDay] = useState(0)
 
     useEffect(() => {
         let { payslipData } = route.params
-        let period = payslipData?.period
-        setStartDay(period.split(" ")[3].split("-")[0])
+        let period = payslipData["Date"]
+        setStartDay(period.split(" ")[2].split("-")[0])
+        setEndDay(period.split(" ")[2].split("-")[1])
         setPaySlipData(payslipData)
     }, [])
+
     
     function renderTopBar(){
         return(
@@ -73,7 +76,7 @@ const Payslip = ({navigation, route}) => {
                                 fontSize: 20,
                                 color: "#FFFFFF"
                             }}
-                        >{payslipdata?.period}</Text>
+                        >{payslipdata["Date"]}</Text>
                     </View>
 
                 </View>
@@ -86,6 +89,21 @@ const Payslip = ({navigation, route}) => {
     
 
     function renderData(){
+        let counter = 0
+        let datas = []
+        for (var key in payslipdata) {
+            if (payslipdata.hasOwnProperty(key)){
+                if(counter >= (parseInt(start_day) + 2) && counter <= (parseInt(end_day) + 2)){
+                    datas.push(
+                        <DataTable.Row key={counter}>
+                            <DataTable.Cell>{key}</DataTable.Cell>
+                            <DataTable.Cell>{payslipdata[key]}</DataTable.Cell>
+                        </DataTable.Row>
+                    )
+                }
+            }
+            counter++
+        }
         return(
             <View
                 style={{
@@ -113,55 +131,55 @@ const Payslip = ({navigation, route}) => {
                 <DataTable>
                     <DataTable.Row>
                         <DataTable.Cell>Total Hours</DataTable.Cell>
-                        <DataTable.Cell>{payslipdata.total_hours}</DataTable.Cell>
+                        <DataTable.Cell>{payslipdata["TOTAL HOURS"]}</DataTable.Cell>
                     </DataTable.Row>
                     <DataTable.Row>
                         <DataTable.Cell>Rate Per Hour</DataTable.Cell>
-                        <DataTable.Cell>{payslipdata.rate}</DataTable.Cell>
+                        <DataTable.Cell>{payslipdata["HOURLY RATE"]}</DataTable.Cell>
                     </DataTable.Row>
                     <DataTable.Row>
                         <DataTable.Cell>Sub Total Pay</DataTable.Cell>
-                        <DataTable.Cell>{payslipdata.sub_total}</DataTable.Cell>
+                        <DataTable.Cell>{payslipdata["SUBTOTAL PAY"]}</DataTable.Cell>
                     </DataTable.Row>
                     <DataTable.Row>
                         <DataTable.Cell>Other Task</DataTable.Cell>
-                        <DataTable.Cell>{payslipdata.other_task}</DataTable.Cell>
+                        <DataTable.Cell>{payslipdata["OTHER TASK"]}</DataTable.Cell>
                     </DataTable.Row>
                     <DataTable.Row>
                         <DataTable.Cell>Incentives</DataTable.Cell>
-                        <DataTable.Cell>{payslipdata.incentives}</DataTable.Cell>
+                        <DataTable.Cell>{payslipdata["INCENTIVES"]}</DataTable.Cell>
                     </DataTable.Row>
                     <DataTable.Row>
                         <DataTable.Cell>Holiday Pay</DataTable.Cell>
-                        <DataTable.Cell>{payslipdata.holiday_pay}</DataTable.Cell>
+                        <DataTable.Cell>{payslipdata["HOLIDAY PAY"]}</DataTable.Cell>
                     </DataTable.Row>
                     <DataTable.Row>
                         <DataTable.Cell>SSS</DataTable.Cell>
-                        <DataTable.Cell>{payslipdata.sss}</DataTable.Cell>
+                        <DataTable.Cell>{payslipdata["SSS"]}</DataTable.Cell>
                     </DataTable.Row>
                     <DataTable.Row>
                         <DataTable.Cell>PHIC</DataTable.Cell>
-                        <DataTable.Cell>{payslipdata.phic}</DataTable.Cell>
+                        <DataTable.Cell>{payslipdata["PHIC"]}</DataTable.Cell>
                     </DataTable.Row>
                     <DataTable.Row>
                         <DataTable.Cell>HDMF</DataTable.Cell>
-                        <DataTable.Cell>{payslipdata.hdmf}</DataTable.Cell>
+                        <DataTable.Cell>{payslipdata["HDMF"]}</DataTable.Cell>
                     </DataTable.Row>
                     <DataTable.Row>
                         <DataTable.Cell>Penalty</DataTable.Cell>
-                        <DataTable.Cell>{payslipdata.penalty}</DataTable.Cell>
+                        <DataTable.Cell>{payslipdata["PENALTY"]}</DataTable.Cell>
                     </DataTable.Row>
                     <DataTable.Row>
                         <DataTable.Cell>Cash Advance</DataTable.Cell>
-                        <DataTable.Cell>{payslipdata.cash_advance}</DataTable.Cell>
+                        <DataTable.Cell>{payslipdata["C.A"]}</DataTable.Cell>
                     </DataTable.Row>
                     <DataTable.Row>
                         <DataTable.Cell>Total Deductions</DataTable.Cell>
-                        <DataTable.Cell>{payslipdata.total_deductions}</DataTable.Cell>
+                        <DataTable.Cell>{payslipdata["TOTAL DEDUCTIONS"]}</DataTable.Cell>
                     </DataTable.Row>
                     <DataTable.Row>
                         <DataTable.Cell>Total Pay</DataTable.Cell>
-                        <DataTable.Cell>{payslipdata.total_pay}</DataTable.Cell>
+                        <DataTable.Cell>{payslipdata["TOTAL PAY"]}</DataTable.Cell>
                     </DataTable.Row>
                 </DataTable>
                 <View
@@ -187,18 +205,7 @@ const Payslip = ({navigation, route}) => {
                         <DataTable.Title>Date</DataTable.Title>
                         <DataTable.Title>Duration</DataTable.Title>
                     </DataTable.Header>
-                    { payslipdata?.data?.map((item, index) => {
-                        const date = parseInt(index) + parseInt(start_day)
-                        const duration = item.inputValue.split(":")
-                        return(
-                            <DataTable.Row
-                                key={index}
-                            >
-                                <DataTable.Cell>{payslipdata?.period.split(" ")[2] + " " + date}</DataTable.Cell>
-                                <DataTable.Cell>{duration[0] + "hr " + duration[1] + " min" }</DataTable.Cell>
-                            </DataTable.Row>
-                        )
-                    })}
+                    {datas}
                 </DataTable>
             </View>
         )
@@ -236,7 +243,6 @@ const Payslip = ({navigation, route}) => {
                 }}
                 onScroll={(event) => {
                     const scrolling = event.nativeEvent.contentOffset.y;
-                    console.log(scrolling)
                     if(scrolling > 70){
                         Animated.timing(
                             header_h,
@@ -258,7 +264,7 @@ const Payslip = ({navigation, route}) => {
                     }
                 }}
             >
-                {renderData()}
+                {payslipdata ? renderData() : console.log(payslipdata)}
             </ScrollView>
             {RenderVersion()}
         </View>

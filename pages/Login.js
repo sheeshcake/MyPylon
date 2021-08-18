@@ -143,7 +143,8 @@ function RenderForm(){
                         <TextInput
                             style={{
                                 width: 300,
-                                height: 40
+                                height: 40,
+                                color: 'black'
                             }}
                             placeholder="Username"
                             onChangeText={setUsername}
@@ -167,7 +168,8 @@ function RenderForm(){
                         <TextInput
                             style={{
                                 width: 300,
-                                height: 40
+                                height: 40,
+                                color: 'black'
                             }}
                             secureTextEntry={true}
                             placeholder="Password"
@@ -200,7 +202,7 @@ function RenderVersion(){
                 alignItems: 'center'
             }}
         >
-            <Text>MyPylon v1.0.0(beta)</Text>
+            <Text>MyPylon v1.1.0(beta)</Text>
         </View>
     )
 }
@@ -210,12 +212,12 @@ function RenderVersion(){
         <SafeAreaView
             style={{
                 flex: 1,
-                backgroundColor: "#daf2fc"
+                backgroundColor: "#0CB0E6"
             }}
         >
             <StatusBar
                 animated={true}
-                backgroundColor="#daf2fc"
+                backgroundColor="#0CB0E6"
             />
             {RenderHeader()}
             <ScrollView>

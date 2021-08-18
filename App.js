@@ -1,13 +1,18 @@
 
-import React from 'react';
-import { Login, Home, Payslip, Account } from "./pages";
+import React, {useEffect} from 'react';
+import { Login, Home, Payslip, Account, Edit, Splash } from "./pages";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from '@react-navigation/native';
+import SplashScreen from 'react-native-splash-screen';
 
 
 const Stack = createStackNavigator();
 
 const App = () => {
+
+  useEffect(() => {
+    SplashScreen.hide()
+  }, [])
 
   return (
     <NavigationContainer>
@@ -15,8 +20,12 @@ const App = () => {
         screenOptions={{
           headerShown: false
         }}
-        initialRouteName={'Login'}
+        initialRouteName={'Splash'}
       >
+        <Stack.Screen
+          name="Splash"
+          component={Splash}
+        />
         <Stack.Screen
           name="Login"
           component={Login}
@@ -32,6 +41,10 @@ const App = () => {
         <Stack.Screen
           name="Payslip"
           component={Payslip}
+      />
+        <Stack.Screen
+          name="Edit"
+          component={Edit}
         />
 
       </Stack.Navigator>

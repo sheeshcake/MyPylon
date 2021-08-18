@@ -1,16 +1,103 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import { View, Text, ImageBackground, SafeAreaView, TouchableOpacity, TouchableHighlight, Image, StatusBar} from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import QRCode from 'react-native-qrcode-svg'
-import {images} from '../assets';
+import {images} from '../assets'
+import BottomSheet from 'reanimated-bottom-sheet';
 
 const Account = ({navigation, route}) => {
 
 
     const [data, setData] = useState([])
     const [qrdata, setQrdata] = useState("")
-
+    const sheetRef = useRef(null);
+    const [isopen, setIsOpen] = useState(false)
+    const renderContent = () => (
+        <View
+          style={{
+            shadowColor: "#000",
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5,
+            backgroundColor: "#0CB0E6",
+            borderTopRightRadius: 30,
+            borderTopLeftRadius: 30,
+            height: 150,
+            padding: 10
+          }}
+        >
+            <View
+                style={{
+                    alignItems: 'center'
+                }}
+            >
+                <Image
+                    style={{
+                        height: 25,
+                        width: 40,
+                        resizeMode: 'stretch',
+                        tintColor: "#FFFFFF"
+                    }}
+                    source={
+                        isopen ? images.downarrow : images.uparrow
+                    }
+                />
+            </View>
+            <View
+                style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                }}
+            >
+                <TouchableHighlight
+                    style={{
+                        margin: 20,
+                        backgroundColor:"#3366CC",
+                        paddingTop: 10,
+                        paddingBottom: 10,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: '40%',
+                        borderRadius: 20,
+                    }}
+                    onPress={() => navigation.navigate("Edit", { userdata: data })}
+                >
+                    <Text
+                        style={{
+                            color: "#FFF",
+                            fontSize: 20
+                        }}
+                    >Edit Account</Text>
+                </TouchableHighlight>
+                <TouchableHighlight
+                    style={{
+                        margin: 20,
+                        backgroundColor:"#eaa8a8",
+                        paddingTop: 10,
+                        paddingBottom: 10,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: '40%',
+                        borderRadius: 20,
+                    }}
+                    onPress={() => onLogout()}
+                >
+                    <Text
+                        style={{
+                            color: "#FFF",
+                            fontSize: 20
+                        }}
+                    >Logout</Text>
+                </TouchableHighlight>
+            </View>
+        </View>
+      );
     useEffect(() => {
         getData()
     }, [])
@@ -45,7 +132,7 @@ const Account = ({navigation, route}) => {
         >
             <StatusBar
                 animated={true}
-                backgroundColor="#a8d6ea"
+                backgroundColor="#0CB0E6"
             />
             <ImageBackground
                 style={{
@@ -167,35 +254,18 @@ const Account = ({navigation, route}) => {
                                 color="#FFF"
                             />
                         </View>
-                        <View
-                            style={{
-                                justifyContent: 'flex-end'
-                            }}
-                        >
-                            <TouchableHighlight
-                                style={{
-                                    margin: 20,
-                                    backgroundColor:"#a8d6ea",
-                                    paddingTop: 10,
-                                    paddingBottom: 10,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    borderRadius: 20,
-                                }}
-                                onPress={() => onLogout()}
-                            >
-                                <Text
-                                    style={{
-                                        color: "#FFF",
-                                        fontSize: 20
-                                    }}
-                                >Logout</Text>
-                            </TouchableHighlight>
-                        </View>
-
                     </View>
                 </View>
             </ImageBackground>
+            <BottomSheet
+                    ref={sheetRef}
+                    initialSnap={1}
+                    snapPoints={[150,50]}
+                    borderRadius={10}
+                    renderContent={renderContent}
+                    onOpenEnd={() => setIsOpen(true)}
+                    onCloseEnd={() => setIsOpen(false)}
+                />
         </SafeAreaView>
     )
 }

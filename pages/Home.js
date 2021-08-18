@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react'
-import { View, Text, ScrollView, StatusBar, Image, TouchableOpacity } from 'react-native'
+import { View, Text, StatusBar, Image, TouchableOpacity } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {images} from '../assets'
 import Animated from 'react-native-reanimated'
@@ -30,14 +30,14 @@ const Home = ({navigation}) => {
                 });
             }
         }else{
-            getPayroll()
+            // getPayroll()
         }
     }, [data])
 
 
     async function getPayroll(){
         setRefresh("Refreshing..")
-        await fetch('https://spreadsheets.google.com/feeds/cells/1qBRZodHpBFARlm2CXSpcbI8fNru_-L3g9cOgmlgRobs/1/public/full?alt=json', {
+        await fetch('https://sheet2api.com/v1/pGYKwE3SjqSS/wendale', {
             method: "GET",
             headers: {
             Accept: 'application/json',
@@ -45,92 +45,15 @@ const Home = ({navigation}) => {
             }
         }).then((response) => response.json())
         .then((d) => {
-            // console.log(data.feed.entry)
-            var all_periods = [];
-            var period = "";
-            var counter = -1;
-            var all_data = d.feed.entry
-            var datas = []
-            var total_hours;
-            var rate;
-            var other_task;
-            var holiday_pay;
-            var incentives;
-            var sss;
-            var phic;
-            var hdmf;
-            var penalty;
-            var total_deductions;
-            var cash_advance;
-            var total_pay;
-            var hour = 0;
-            var minute = 0;
-            var sub_total = 0;
-            all_data.forEach((d, i1) => {
-                //getting the period
-                if(d.gs$cell.inputValue.includes("Period: ")){
-                    if(d.gs$cell.inputValue != period){
-                        period = d.gs$cell.inputValue;
-                        counter++;
-                        sub_total = 0;
-                        hour = 0;
-                        minute = 0;
-                    }
-                }else{
-                    //getting the id
-                    if(d.gs$cell.col == 1){
-                        if(d.gs$cell.inputValue == data?.user?.company_id/* this is the id number */){
-                            //getting all the data of the row
-                            for(var i = 0; i < all_data.length; i++){
-                                if(all_data[i].gs$cell.row == d.gs$cell.row){
-                                    if( all_data[i].gs$cell.col > 3 && all_data[i].gs$cell.col < 20){
-                                        datas = [...datas, all_data[i].gs$cell];
-                                        var time = all_data[i].gs$cell.inputValue.split(":");
-                                        hour = hour + parseInt(time[0]);
-                                        minute = minute + parseInt(time[1]);
-                                        sub_total = sub_total + ( (parseInt(time[0] * parseInt(rate)) + ( (parseInt(time[1])/60) * parseInt(rate) ) ))
-                                    }
-                                    switch(all_data[i].gs$cell.col){
-                                        case '3': rate = all_data[i].gs$cell.numericValue; break;
-                                        // case '20': total_hours = all_data[i].gs$cell.numericValue; console.log(all_data[i].gs$cell); break;
-                                        // case '21': sub_total = all_data[i].gs$cell.numericValue; console.log(all_data[i].gs$cell); break;
-                                        case '22': other_task = all_data[i].gs$cell.numericValue; break;
-                                        case '23': incentives = all_data[i].gs$cell.numericValue; break;
-                                        case '24': holiday_pay = all_data[i].gs$cell.numericValue; break;
-                                        case '25': sss = all_data[i].gs$cell.numericValue; break;
-                                        case '26': phic = all_data[i].gs$cell.numericValue; break;
-                                        case '27': hdmf = all_data[i].gs$cell.numericValue; break;
-                                        case '28': penalty = all_data[i].gs$cell.numericValue; break;
-                                        case '30': total_deductions = all_data[i].gs$cell.numericValue; break;
-                                        case '29': cash_advance = all_data[i].gs$cell.numericValue; break;
-                                        case '31': total_pay = all_data[i].gs$cell.numericValue; break;
-                                    }
-                                }
-                            }
-                            //append to all periods
-                            all_periods[counter] = {
-                                "period": period,
-                                "data": datas,
-                                'rate': rate,
-                                'total_hours': hour + "hrs " + minute + "mins",
-                                'sub_total': sub_total,
-                                'other_task': other_task,
-                                'incentives': incentives,
-                                'holiday_pay': holiday_pay,
-                                'sss': sss,
-                                'phic': phic,
-                                'hdmf': hdmf,
-                                'penalty': penalty,
-                                'total_deductions': total_deductions,
-                                'cash_advance': cash_advance,
-                                'total_pay': total_pay,
-                            };
-                            datas = [];
-                        }
-                    }
+            var counter = 0;
+            var periods = [];
+            d.forEach((entry, index) => {
+                if(entry["ID Number"] == data?.user?.company_id){
+                    periods[counter] = entry
+                    console.log(entry["DatePeriod"])
                 }
             })
-            setAll_periods(all_periods) // output for data
+            setAll_periods(periods)
             setRefresh("Refresh")
         })
     }
@@ -255,7 +178,7 @@ const Home = ({navigation}) => {
 
                     <TouchableOpacity
                         style={{
-                            backgroundColor: "#4154f1",
+                            backgroundColor: "#0CB0E6",
                             padding: 5,
                             borderRadius: 10,
                         }}
@@ -281,7 +204,7 @@ const Home = ({navigation}) => {
                     alignItems: 'center'
                 }}
             >
-                <Text>MyPylon v1.0.0(beta)</Text>
+                <Text>MyPylon v1.1.0(beta)</Text>
             </View>
         )
     }
@@ -315,11 +238,12 @@ const Home = ({navigation}) => {
                     >
                         {
                             all_periods.length > 0 && refresh != "Refreshing.." ? all_periods.map((d, index) => {
+                                console.log(d)
                                 return(
                                     <TouchableOpacity
                                         key={index}
                                         style={{
-                                            backgroundColor: "#daf2fc",
+                                            backgroundColor: "#0CB0E6",
                                             borderRadius: 20,
                                             marginBottom: 20,
                                             borderColor: "#000000",
@@ -329,18 +253,19 @@ const Home = ({navigation}) => {
                                             alignItems: 'center',
                                             flex: 1,
                                         }}
+                                        activeOpacity={d["STATUS"] == "TRUE" ? 1 : 0.7}
                                         onPress={() => {
-                                            d?.data?.length ? navigation.navigate("Payslip", { payslipData: d }) : null
+                                            d["STATUS"] == "TRUE" ? navigation.navigate("Payslip", { payslipData: d }) : null
                                         }}
                                     >
                                         <Text
                                             style={{
                                                 fontSize: 20
                                             }}
-                                        >{d?.period}</Text>
+                                        >{d["Date"]}</Text>
                                         <Text>
                                             {
-                                                d?.data?.length ? "Status: Released" : "Status: Pending"
+                                                d["STATUS"] == "TRUE" ? "Status: Released" : "Status: Pending"
                                             }
                                         </Text>
                                     </TouchableOpacity>
